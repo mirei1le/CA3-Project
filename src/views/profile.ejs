@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+
+<h1>My profile</h1>
+
+<div class="card">
+  <h2>Personal details</h2>
+  <form method="post" action="/profile">
+    <label for="name">Full name</label>
+    <input type="text" id="name" name="name" value="<%= user.name %>" required>
+
+    <label>Email</label>
+    <input type="email" value="<%= user.email %>" disabled>
+
+    <label>Role</label>
+    <input type="text" value="<%= user.role %>" disabled>
+
+    <% if (user.role === 'student') { %>
+      <label>Student number</label>
+      <input type="text" value="<%= user.studentNumber %>" disabled>
+    <% } %>
+
+    <label for="phone">Phone</label>
+    <input type="text" id="phone" name="phone" value="<%= user.phone %>">
+
+    <label for="address">Address</label>
+    <input type="text" id="address" name="address" value="<%= user.address %>">
+
+    <label for="dateOfBirth">Date of birth</label>
+    <input type="date" id="dateOfBirth" name="dateOfBirth" value="<%= user.dateOfBirth %>">
+
+    <button type="submit">Save changes</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Change password</h2>
+  <form method="post" action="/profile/password">
+    <label for="currentPassword">Current password</label>
+    <input type="password" id="currentPassword" name="currentPassword" required>
+
+    <label for="newPassword">New password</label>
+    <input type="password" id="newPassword" name="newPassword" required>
+
+    <button type="submit">Change password</button>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

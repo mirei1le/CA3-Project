@@ -1,0 +1,45 @@
+<%- include('../partials/header') %>
+
+<div class="page-head">
+  <h1>Modules</h1>
+  <% if (currentUser.role === 'admin') { %>
+    <a class="button" href="/admin/modules/new">New module</a>
+  <% } %>
+</div>
+
+<form class="search" method="get" action="/modules">
+  <input type="text" name="q" value="<%= q %>" placeholder="Search by code or title">
+  <button type="submit">Search</button>
+  <% if (q) { %><a href="/modules">Clear</a><% } %>
+</form>
+
+<div class="card">
+  <% if (modules.length === 0) { %>
+    <p class="muted">No modules found.</p>
+  <% } else { %>
+    <table>
+      <tr>
+        <th>Code</th><th>Title</th><th>Lecturer</th><th>Students</th>
+        <% if (currentUser.role === 'admin') { %><th></th><% } %>
+      </tr>
+      <% modules.forEach((m) => { %>
+        <tr>
+          <td><a href="/modules/<%= m._id %>"><%= m.code %></a></td>
+          <td><%= m.title %></td>
+          <td><%= m.lecturer ? m.lecturer.name : '-' %></td>
+          <td><%= m.students.length %></td>
+          <% if (currentUser.role === 'admin') { %>
+            <td class="actions">
+              <a href="/admin/modules/<%= m._id %>/edit">Edit</a>
+              <form method="post" action="/admin/modules/<%= m._id %>/delete" onsubmit="return confirm('Delete this module and everything in it?')">
+                <button type="submit" class="link danger">Delete</button>
+              </form>
+            </td>
+          <% } %>
+        </tr>
+      <% }) %>
+    </table>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+
+<h1>Welcome, <%= currentUser.name %></h1>
+
+<% if (currentUser.role === 'admin') { %>
+
+  <div class="stats">
+    <div class="stat"><span class="num"><%= stats.students %></span>Students</div>
+    <div class="stat"><span class="num"><%= stats.lecturers %></span>Lecturers</div>
+    <div class="stat"><span class="num"><%= stats.admins %></span>Admins</div>
+    <div class="stat"><span class="num"><%= stats.modules %></span>Modules</div>
+    <div class="stat"><span class="num"><%= stats.assignments %></span>Assignments</div>
+    <div class="stat"><span class="num"><%= stats.submissions %></span>Submissions</div>
+  </div>
+
+  <div class="card">
+    <h2>Administration</h2>
+    <p>
+      <a class="button" href="/admin/users">Manage users</a>
+      <a class="button" href="/modules">Manage modules</a>
+    </p>
+  </div>
+
+<% } else { %>
+
+  <% if (currentUser.role === 'lecturer') { %>
+    <div class="stats">
+      <div class="stat"><span class="num"><%= modules.length %></span>Modules you teach</div>
+      <div class="stat"><span class="num"><%= toGrade %></span>Submissions to grade</div>
+    </div>
+  <% } %>
+
+  <div class="card">
+    <h2><%= currentUser.role === 'student' ? 'My modules' : 'Modules I teach' %></h2>
+    <% if (modules.length === 0) { %>
+      <p class="muted">No modules yet.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Code</th><th>Title</th><th>Lecturer</th></tr>
+        <% modules.forEach((m) => { %>
+          <tr>
+            <td><a href="/modules/<%= m._id %>"><%= m.code %></a></td>
+            <td><%= m.title %></td>
+            <td><%= m.lecturer ? m.lecturer.name : '-' %></td>
+          </tr>
+        <% }) %>
+      </table>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <h2>Assignments</h2>
+    <% if (assignments.length === 0) { %>
+      <p class="muted">No assignments yet.</p>
+    <% } else { %>
+      <table>
+        <tr>
+          <th>Module</th><th>Assignment</th><th>Due</th>
+          <% if (currentUser.role === 'student') { %><th>Status</th><% } %>
+        </tr>
+        <% assignments.forEach((a) => { %>
+          <tr>
+            <td><%= a.module.code %></td>
+            <td><a href="/assignments/<%= a._id %>"><%= a.title %></a></td>
+            <td><%= formatDate(a.dueDate) %></td>
+            <% if (currentUser.role === 'student') { %>
+              <td>
+                <% if (submittedIds.includes(a._id.toString())) { %>
+                  <span class="tag tag-ok">Submitted</span>
+                <% } else if (a.dueDate < new Date()) { %>
+                  <span class="tag tag-late">Overdue</span>
+                <% } else { %>
+                  <span class="tag">Not submitted</span>
+                <% } %>
+              </td>
+            <% } %>
+          </tr>
+        <% }) %>
+      </table>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <h2>Latest announcements</h2>
+    <% if (announcements.length === 0) { %>
+      <p class="muted">No announcements yet.</p>
+    <% } %>
+    <% announcements.forEach((a) => { %>
+      <div class="announcement">
+        <h3><%= a.title %></h3>
+        <p class="muted">
+          <a href="/modules/<%= a.module._id %>"><%= a.module.code %></a>
+          &middot; <%= a.author ? a.author.name : 'Unknown' %>
+          &middot; <%= formatDate(a.createdAt) %>
+        </p>
+        <p><%= a.body %></p>
+      </div>
+    <% }) %>
+  </div>
+
+<% } %>
+
+<%- include('partials/footer') %>

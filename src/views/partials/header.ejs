@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> | Student Portal</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">Student Portal</a>
+    <% if (currentUser) { %>
+      <nav>
+        <a href="/">Dashboard</a>
+        <a href="/modules">Modules</a>
+        <% if (currentUser.role === 'student') { %>
+          <a href="/grades">My grades</a>
+        <% } %>
+        <% if (currentUser.role === 'admin') { %>
+          <a href="/admin/users">Users</a>
+        <% } %>
+        <a href="/profile">Profile</a>
+      </nav>
+      <div class="user">
+        <span><%= currentUser.name %></span>
+        <span class="badge badge-<%= currentUser.role %>"><%= currentUser.role %></span>
+        <a href="/logout">Log out</a>
+      </div>
+    <% } %>
+  </header>
+
+  <main class="container">
+    <% if (flash) { %>
+      <div class="flash flash-<%= flash.type %>"><%= flash.text %></div>
+    <% } %>
