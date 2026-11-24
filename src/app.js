@@ -9,7 +9,11 @@ const User = require('./models/User');
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost:27017/student_portal';
-const SESSION_SECRET = process.env.SESSION_SECRET || 'student-portal-secret';
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
+if (!SESSION_SECRET) {
+  throw new Error('SESSION_SECRET environment variable is required');
+}
 
 const app = express();
 
@@ -22,15 +26,57 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Sessions (stored in MongoDB so they survive a restart)
+
+ // SEC-02: Secure session configuration
 app.use(
   session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    rolling: true,
     store: MongoStore.create({ mongoUrl: MONGO_URL }),
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.SESSION_COOKIE_SECURE === 'true',
+      maxAge: 15 * 60 * 1000
+    }
   })
 );
+
+const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000;
+
+// SEC-02: Enforce inactivity timeout on the server
+app.use((req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
+
+  const now = Date.now();
+  const lastActivity = req.session.lastActivityAt;
+
+  if (
+    typeof lastActivity === 'number' &&
+    now - lastActivity >= INACTIVITY_TIMEOUT_MS
+  ) {
+    return req.session.destroy((err) => {
+      if (err) return next(err);
+
+      res.clearCookie('connect.sid', {
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.SESSION_COOKIE_SECURE === 'true'
+      });
+
+      return res.redirect('/login');
+    });
+  }
+
+  req.session.lastActivityAt = now;
+  next();
+});
+
+
 
 // Make the logged-in user, flash messages and helpers available in every view
 app.use((req, res, next) => {

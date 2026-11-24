@@ -11,6 +11,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "argon2": "^0.45.2",
     "bcryptjs": "^3.0.3",
     "connect-mongo": "^6.0.0",
     "ejs": "^7.0.2",

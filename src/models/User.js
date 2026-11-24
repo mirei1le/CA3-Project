@@ -12,6 +12,18 @@ const userSchema = new mongoose.Schema({
   address: String,
   dateOfBirth: String,
 
+  // SEC-01: Track failed login attempts
+failedLoginAttempts: {
+  type: Number,
+  default: 0,
+  min: 0
+},
+
+// SEC-01: Temporarily lock accounts
+lockUntil: {
+  type: Date,
+  default: null
+},
   createdAt: { type: Date, default: Date.now },
 });
 

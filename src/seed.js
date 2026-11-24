@@ -5,7 +5,7 @@
 const path = require('path');
 const fs = require('fs');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 
 const User = require('./models/User');
 const Module = require('./models/Module');
@@ -20,9 +20,18 @@ function daysFromNow(days) {
 }
 
 async function seedDatabase() {
-  const adminPassword = await bcrypt.hash('Admin123!', 10);
-  const lecturerPassword = await bcrypt.hash('Lecturer123!', 10);
-  const studentPassword = await bcrypt.hash('Student123!', 10);
+// SEC-01: Secure password hashing using Argon2id
+const adminPassword = await argon2.hash('Admin123!', {
+  type: argon2.argon2id
+});
+
+const lecturerPassword = await argon2.hash('Lecturer123!', {
+  type: argon2.argon2id
+});
+
+const studentPassword = await argon2.hash('Student123!', {
+  type: argon2.argon2id
+});
 
   // ----- Users -----
   const admin = await User.create({
