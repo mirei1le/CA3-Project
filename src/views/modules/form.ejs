@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+<%
+  const action = module ? '/admin/modules/' + module._id : '/admin/modules';
+  const enrolled = module ? module.students.map((s) => s.toString()) : [];
+  const currentLecturer = module && module.lecturer ? module.lecturer.toString() : '';
+%>
+
+<h1><%= title %></h1>
+
+<div class="card">
+  <form method="post" action="<%= action %>">
+    <label for="code">Module code</label>
+    <input type="text" id="code" name="code" value="<%= module ? module.code : '' %>" required>
+
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" value="<%= module ? module.title : '' %>" required>
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="3"><%= module ? module.description : '' %></textarea>
+
+    <label for="lecturer">Lecturer</label>
+    <select id="lecturer" name="lecturer">
+      <option value="">Not assigned</option>
+      <% lecturers.forEach((l) => { %>
+        <option value="<%= l._id %>" <%= currentLecturer === l._id.toString() ? 'selected' : '' %>><%= l.name %></option>
+      <% }) %>
+    </select>
+
+    <label>Enrolled students</label>
+    <div class="checklist">
+      <% students.forEach((s) => { %>
+        <label class="check">
+          <input type="checkbox" name="students" value="<%= s._id %>" <%= enrolled.includes(s._id.toString()) ? 'checked' : '' %>>
+          <%= s.name %> (<%= s.studentNumber %>)
+        </label>
+      <% }) %>
+    </div>
+
+    <button type="submit">Save module</button>
+    <a href="/modules">Cancel</a>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

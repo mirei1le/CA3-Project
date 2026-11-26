@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+
+<h1>My grades</h1>
+
+<div class="card">
+  <% if (submissions.length === 0) { %>
+    <p class="muted">You have not submitted any work yet.</p>
+  <% } else { %>
+    <table>
+      <tr><th>Module</th><th>Assignment</th><th>Submitted</th><th>Grade</th><th>Feedback</th></tr>
+      <% submissions.forEach((s) => { %>
+        <tr>
+          <td><%= s.assignment && s.assignment.module ? s.assignment.module.code : '-' %></td>
+          <td>
+            <% if (s.assignment) { %>
+              <a href="/assignments/<%= s.assignment._id %>"><%= s.assignment.title %></a>
+            <% } else { %>
+              (deleted assignment)
+            <% } %>
+          </td>
+          <td><%= formatDate(s.submittedAt) %></td>
+          <td>
+            <% if (s.grade != null) { %>
+              <strong><%= s.grade %></strong> / <%= s.assignment ? s.assignment.maxMarks : '' %>
+            <% } else { %>
+              <span class="tag">Not graded yet</span>
+            <% } %>
+          </td>
+          <td><%= s.feedback %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

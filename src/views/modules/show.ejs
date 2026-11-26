@@ -1,0 +1,91 @@
+<%- include('../partials/header') %>
+<% const canManage = currentUser.role === 'lecturer' || currentUser.role === 'admin'; %>
+
+<div class="page-head">
+  <h1><%= module.code %>: <%= module.title %></h1>
+  <% if (currentUser.role === 'admin') { %>
+    <a class="button" href="/admin/modules/<%= module._id %>/edit">Edit module</a>
+  <% } %>
+</div>
+
+<p><%= module.description %></p>
+<p class="muted">Lecturer: <%= module.lecturer ? module.lecturer.name : 'Not assigned' %></p>
+
+<div class="card">
+  <div class="page-head">
+    <h2>Assignments</h2>
+    <% if (canManage) { %>
+      <a class="button" href="/modules/<%= module._id %>/assignments/new">New assignment</a>
+    <% } %>
+  </div>
+  <% if (assignments.length === 0) { %>
+    <p class="muted">No assignments yet.</p>
+  <% } else { %>
+    <table>
+      <tr><th>Assignment</th><th>Due</th><th>Marks</th></tr>
+      <% assignments.forEach((a) => { %>
+        <tr>
+          <td><a href="/assignments/<%= a._id %>"><%= a.title %></a></td>
+          <td><%= formatDate(a.dueDate) %></td>
+          <td><%= a.maxMarks %></td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } %>
+</div>
+
+<div class="card">
+  <h2>Announcements</h2>
+
+  <% if (canManage) { %>
+    <form method="post" action="/modules/<%= module._id %>/announcements" class="inline-form">
+      <label for="title">Title</label>
+      <input type="text" id="title" name="title" required>
+      <label for="body">Message</label>
+      <textarea id="body" name="body" rows="3" required></textarea>
+      <button type="submit">Post announcement</button>
+    </form>
+    <hr>
+  <% } %>
+
+  <% if (announcements.length === 0) { %>
+    <p class="muted">No announcements yet.</p>
+  <% } %>
+  <% announcements.forEach((a) => { %>
+    <div class="announcement">
+      <h3><%= a.title %></h3>
+      <p class="muted"><%= a.author ? a.author.name : 'Unknown' %> &middot; <%= formatDate(a.createdAt) %></p>
+      <p><%= a.body %></p>
+      <% if (canManage) { %>
+        <div class="actions">
+          <a href="/announcements/<%= a._id %>/edit">Edit</a>
+          <form method="post" action="/announcements/<%= a._id %>/delete" onsubmit="return confirm('Delete this announcement?')">
+            <button type="submit" class="link danger">Delete</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+  <% }) %>
+</div>
+
+<% if (canManage) { %>
+  <div class="card">
+    <h2>Enrolled students (<%= module.students.length %>)</h2>
+    <% if (module.students.length === 0) { %>
+      <p class="muted">No students enrolled.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Name</th><th>Student number</th><th>Email</th></tr>
+        <% module.students.forEach((s) => { %>
+          <tr>
+            <td><%= s.name %></td>
+            <td><%= s.studentNumber %></td>
+            <td><%= s.email %></td>
+          </tr>
+        <% }) %>
+      </table>
+    <% } %>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

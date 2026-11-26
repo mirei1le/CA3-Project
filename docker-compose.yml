@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      MONGO_URL: mongodb://mongo:27017/student_portal
+    depends_on:
+      - mongo
+    volumes:
+      - uploads:/app/uploads
+
+  mongo:
+    image: mongo:8
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+  uploads:

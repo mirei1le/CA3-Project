@@ -1,0 +1,39 @@
+<%- include('../partials/header') %>
+
+<div class="page-head">
+  <h1>Manage users</h1>
+  <a class="button" href="/admin/users/new">New user</a>
+</div>
+
+<form class="search" method="get" action="/admin/users">
+  <input type="text" name="q" value="<%= q %>" placeholder="Search by name or email">
+  <button type="submit">Search</button>
+  <% if (q) { %><a href="/admin/users">Clear</a><% } %>
+</form>
+
+<div class="card">
+  <% if (users.length === 0) { %>
+    <p class="muted">No users found.</p>
+  <% } else { %>
+    <table>
+      <tr><th>Name</th><th>Email</th><th>Role</th><th>Student number</th><th>Phone</th><th></th></tr>
+      <% users.forEach((u) => { %>
+        <tr>
+          <td><%= u.name %></td>
+          <td><%= u.email %></td>
+          <td><span class="badge badge-<%= u.role %>"><%= u.role %></span></td>
+          <td><%= u.studentNumber %></td>
+          <td><%= u.phone %></td>
+          <td class="actions">
+            <a href="/admin/users/<%= u._id %>/edit">Edit</a>
+            <form method="post" action="/admin/users/<%= u._id %>/delete" onsubmit="return confirm('Delete this user?')">
+              <button type="submit" class="link danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

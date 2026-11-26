@@ -1,0 +1,6 @@
+node_modules/
+.env
+
+# Uploaded files are not committed (the folder itself is kept)
+uploads/*
+!uploads/.gitkeep

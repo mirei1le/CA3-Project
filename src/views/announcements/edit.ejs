@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+
+<h1>Edit announcement</h1>
+<p class="muted">Module: <%= announcement.module ? announcement.module.code : '' %></p>
+
+<div class="card">
+  <form method="post" action="/announcements/<%= announcement._id %>">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" value="<%= announcement.title %>" required>
+
+    <label for="body">Message</label>
+    <textarea id="body" name="body" rows="5" required><%= announcement.body %></textarea>
+
+    <button type="submit">Save changes</button>
+    <a href="/modules/<%= announcement.module ? announcement.module._id : '' %>">Cancel</a>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

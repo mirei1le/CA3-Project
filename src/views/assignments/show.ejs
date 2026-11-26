@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+<% const canManage = currentUser.role === 'lecturer' || currentUser.role === 'admin'; %>
+
+<div class="page-head">
+  <h1><%= assignment.title %></h1>
+  <% if (canManage) { %>
+    <div class="actions">
+      <a class="button" href="/assignments/<%= assignment._id %>/edit">Edit</a>
+      <form method="post" action="/assignments/<%= assignment._id %>/delete" onsubmit="return confirm('Delete this assignment and all its submissions?')">
+        <button type="submit" class="danger">Delete</button>
+      </form>
+    </div>
+  <% } %>
+</div>
+
+<p class="muted">
+  Module: <a href="/modules/<%= assignment.module._id %>"><%= assignment.module.code %>: <%= assignment.module.title %></a>
+  &middot; Due: <%= formatDate(assignment.dueDate) %>
+  &middot; Marks: <%= assignment.maxMarks %>
+</p>
+<p><%= assignment.description %></p>
+
+<% if (currentUser.role === 'student') { %>
+
+  <div class="card">
+    <h2>My submission</h2>
+    <% if (mySubmission) { %>
+      <table>
+        <tr><th>File</th><td><a href="/submissions/<%= mySubmission._id %>/download"><%= mySubmission.originalName %></a></td></tr>
+        <tr><th>Submitted</th><td><%= formatDate(mySubmission.submittedAt) %></td></tr>
+        <tr><th>Comment</th><td><%= mySubmission.comment %></td></tr>
+        <tr>
+          <th>Grade</th>
+          <td>
+            <% if (mySubmission.grade != null) { %>
+              <strong><%= mySubmission.grade %></strong> / <%= assignment.maxMarks %>
+            <% } else { %>
+              <span class="tag">Not graded yet</span>
+            <% } %>
+          </td>
+        </tr>
+        <tr><th>Feedback</th><td><%= mySubmission.feedback %></td></tr>
+      </table>
+      <form method="post" action="/submissions/<%= mySubmission._id %>/delete" onsubmit="return confirm('Delete your submission?')">
+        <button type="submit" class="danger">Delete submission</button>
+      </form>
+    <% } else { %>
+      <p class="muted">You have not submitted anything yet.</p>
+    <% } %>
+  </div>
+
+  <div class="card">
+    <h2><%= mySubmission ? 'Replace submission' : 'Upload submission' %></h2>
+    <form method="post" action="/assignments/<%= assignment._id %>/submit" enctype="multipart/form-data">
+      <label for="file">File</label>
+      <input type="file" id="file" name="file" required>
+
+      <label for="comment">Comment (optional)</label>
+      <textarea id="comment" name="comment" rows="2"></textarea>
+
+      <button type="submit">Upload</button>
+    </form>
+  </div>
+
+<% } else { %>
+
+  <div class="card">
+    <h2>Submissions (<%= submissions.length %>)</h2>
+    <% if (submissions.length === 0) { %>
+      <p class="muted">No submissions yet.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Student</th><th>File</th><th>Submitted</th><th>Comment</th><th>Grade and feedback</th></tr>
+        <% submissions.forEach((s) => { %>
+          <tr>
+            <td><%= s.student ? s.student.name : '(deleted user)' %></td>
+            <td><a href="/submissions/<%= s._id %>/download"><%= s.originalName %></a></td>
+            <td>
+              <%= formatDate(s.submittedAt) %>
+              <% if (s.submittedAt > assignment.dueDate) { %><span class="tag tag-late">Late</span><% } %>
+            </td>
+            <td><%= s.comment %></td>
+            <td>
+              <form method="post" action="/submissions/<%= s._id %>/grade" class="grade-form">
+                <input type="number" name="grade" value="<%= s.grade != null ? s.grade : '' %>" min="0" max="<%= assignment.maxMarks %>" placeholder="Grade" required>
+                <input type="text" name="feedback" value="<%= s.feedback %>" placeholder="Feedback">
+                <button type="submit">Save</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </table>
+    <% } %>
+  </div>
+
+<% } %>
+
+<%- include('../partials/footer') %>

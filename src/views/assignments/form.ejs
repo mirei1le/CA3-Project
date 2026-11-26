@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<% const action = assignment ? '/assignments/' + assignment._id : '/modules/' + module._id + '/assignments'; %>
+
+<h1><%= title %></h1>
+<p class="muted">Module: <%= module.code %>: <%= module.title %></p>
+
+<div class="card">
+  <form method="post" action="<%= action %>">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" value="<%= assignment ? assignment.title : '' %>" required>
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="4"><%= assignment ? assignment.description : '' %></textarea>
+
+    <label for="dueDate">Due date</label>
+    <input type="datetime-local" id="dueDate" name="dueDate" value="<%= assignment ? toInputDate(assignment.dueDate) : '' %>" required>
+
+    <label for="maxMarks">Maximum marks</label>
+    <input type="number" id="maxMarks" name="maxMarks" value="<%= assignment ? assignment.maxMarks : 100 %>">
+
+    <button type="submit">Save assignment</button>
+    <a href="<%= assignment ? '/assignments/' + assignment._id : '/modules/' + module._id %>">Cancel</a>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
